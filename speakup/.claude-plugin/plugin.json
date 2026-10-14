@@ -1,7 +1,7 @@
 {
   "name": "speakup",
   "version": "0.1.0",
-  "description": "/voice toggles read-along reading replies aloud (off by default); /v aliases /read-along",
+  "description": "Kokoro-82M reads Claude's replies aloud when you type /voice (off by default; af_aoede voice, swappable). /v aliases /read-along",
   "types": "./types/index.d.ts",
   "author": {
     "name": "Tim Rayner"

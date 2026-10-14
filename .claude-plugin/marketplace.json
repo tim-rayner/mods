@@ -8,7 +8,7 @@
     {
       "name": "speakup",
       "source": "./speakup",
-      "description": "/voice toggles read-along (off by default), /v aliases /read-along"
+      "description": "Kokoro-82M reads Claude's replies aloud when you type /voice (off by default; af_aoede voice, swappable). /v aliases /read-along"
     }
   ]
 }

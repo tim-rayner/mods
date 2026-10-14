@@ -4,7 +4,7 @@ My collection of Claude Code mods. Each folder is one mod; `.claude-plugin/marke
 
 | Mod | What it does |
 | --- | --- |
-| [speakup](speakup/) | Claude reads replies aloud only when you type `/voice`, in Kokoro's af_aoede voice. [Install it →](speakup/README.md#install) |
+| [speakup](speakup/) | Kokoro-82M reads Claude's replies aloud, locally, only when you type `/voice` (af_aoede voice by default; swappable). [Install it →](speakup/README.md#install) |
 
 ## Install a mod
 
