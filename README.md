@@ -1,4 +1,4 @@
-# tim-mods
+# tims-mods
 
 My collection of Claude Code mods. Each folder is one mod; `.claude-plugin/marketplace.json` lists them.
 
