@@ -1,0 +1,14 @@
+{
+  "name": "tim-mods",
+  "owner": {
+    "name": "Tim Rayner"
+  },
+  "description": "Tim Rayner's Claude Code mods",
+  "plugins": [
+    {
+      "name": "tim-mods",
+      "source": "./",
+      "description": "/voice toggles read-along (off by default), /r aliases /read-along"
+    }
+  ]
+}
