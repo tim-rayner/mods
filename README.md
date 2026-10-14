@@ -1,26 +1,19 @@
 # tim-mods
 
-My Claude Code mods, in one plugin. Builds on [read-along](https://github.com/tomfluff/claude-read-along).
+My collection of Claude Code mods. Each folder is one mod; `.claude-plugin/marketplace.json` lists them.
 
-| Command | What it does |
+| Mod | What it does |
 | --- | --- |
-| `/voice` | Toggle read-along reading replies aloud for this session. Off at the start of every session. |
-| `/voice on` / `/voice off` | Set it explicitly (`off` also stops anything being read). |
-| `/voice all` | Read every text block as it streams, not just the final answer. |
-| `/voice dictation …` | Pass through to Claude Code's built-in `/voice` (dictation), where this build has one. |
-| `/r …` | Alias for `/read-along …` (`/r stop`, `/r speed 1.2`, …). |
+| [voice](voice/) | `/voice` toggles [read-along](https://github.com/tomfluff/claude-read-along) reading replies aloud (off by default); `/r` aliases `/read-along`. |
 
-Sessions start silent because read-along's `autoReadReplies` option is set to `off` in
-`~/.claude/settings.json` (`pluginConfigs["read-along@claude-read-along"].options`).
-
-## Install
+## Install a mod
 
 ```
-/plugin install tim-mods --marketplace tim-rayner/mods
+/plugin install <mod> --marketplace tim-rayner/mods
 ```
 
-Or from this folder: `claude plugin marketplace add ~/repos/mods && claude plugin install tim-mods@tim-mods`.
+e.g. `/plugin install voice --marketplace tim-rayner/mods`.
 
-## Develop
+## Adding a mod
 
-`claude plugin validate .` and `claude plugin test .`
+Make `<mod>/` with `.claude-plugin/plugin.json`, `hooks/hooks.json` and `hooks/register.tsx`, add `{ "name": "<mod>", "source": "./<mod>" }` to `plugins` in `.claude-plugin/marketplace.json`, then `claude plugin validate <mod>` and `claude plugin test <mod>`.

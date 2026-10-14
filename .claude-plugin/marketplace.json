@@ -3,11 +3,11 @@
   "owner": {
     "name": "Tim Rayner"
   },
-  "description": "Tim Rayner's Claude Code mods",
+  "description": "Tim Rayner's collection of Claude Code mods",
   "plugins": [
     {
-      "name": "tim-mods",
-      "source": "./",
+      "name": "voice",
+      "source": "./voice",
       "description": "/voice toggles read-along (off by default), /r aliases /read-along"
     }
   ]

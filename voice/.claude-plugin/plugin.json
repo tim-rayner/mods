@@ -1,0 +1,9 @@
+{
+  "name": "voice",
+  "version": "0.1.0",
+  "description": "/voice toggles read-along reading replies aloud (off by default); /r aliases /read-along",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Tim Rayner"
+  }
+}

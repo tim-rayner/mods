@@ -1,9 +1,0 @@
-{
-  "name": "tim-mods",
-  "version": "0.1.0",
-  "description": "Tim's Claude Code mods: /voice toggles read-along (off by default), /r aliases /read-along",
-  "types": "./types/index.d.ts",
-  "author": {
-    "name": "Tim Rayner"
-  }
-}
