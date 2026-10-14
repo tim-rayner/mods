@@ -20,4 +20,4 @@ Make `<mod>/` with `.claude-plugin/plugin.json`, `hooks/hooks.json` and `hooks/r
 
 ## Credits and licence
 
-speakup is built on [read-along](https://github.com/tomfluff/claude-read-along) by Yotam Sechayk (MIT). Everything here is MIT licensed; see [LICENSE](LICENSE).
+speakup is built on [read-along](https://github.com/tomfluff/claude-read-along) by Yotam (MIT). Everything here is MIT licensed; see [LICENSE](LICENSE).

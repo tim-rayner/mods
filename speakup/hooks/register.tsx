@@ -1,4 +1,4 @@
-// speakup: built on read-along by Yotam Sechayk (https://github.com/tomfluff/claude-read-along, MIT).
+// speakup: built on read-along by Yotam (https://github.com/tomfluff/claude-read-along, MIT).
 import { atom, read, update } from 'claude-code'
 import type { ConfigRow, EngineInterface, Register } from 'claude-code'
 
@@ -37,7 +37,7 @@ async function setUpReadAlong($: EngineInterface) {
   }
 }
 
-/** read-along's `voices` option, `main=aoede, auto; ja=…`, as the first voice of each group: adapted from read-along's `parseVoices` (MIT, © Yotam Sechayk). */
+/** read-along's `voices` option, `main=aoede, auto; ja=…`, as the first voice of each group: adapted from read-along's `parseVoices` (MIT, © Yotam). */
 const firstVoices = (option: string) => {
   const out: Record<string, string> = {}
   for (const part of option.split(';')) {

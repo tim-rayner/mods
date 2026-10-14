@@ -245,13 +245,13 @@ voice. `/v` hands its arguments to `/read-along`.
 ## Credits and licence
 
 **Speakup is built on [read-along](https://github.com/tomfluff/claude-read-along)
-by [Yotam Sechayk](https://github.com/tomfluff).** read-along does all of the
+by [Yotam](https://github.com/tomfluff).** read-along does all of the
 speaking: the speech service, the Kokoro setup, the voices, the highlight and
 the player. Speakup only decides when it speaks, and wouldn't exist without it.
 Speakup also follows read-along's own conventions to talk to its speech
 service (the socket, the `/speak` request, and how the Voices setting is
 read), and this README follows the structure of read-along's. read-along is
-MIT licensed, © Yotam Sechayk; speakup bundles none of its code, and you
+MIT licensed, © Yotam; speakup bundles none of its code, and you
 install it from [its own repository](https://github.com/tomfluff/claude-read-along).
 
 The recommended voice model is [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) by
