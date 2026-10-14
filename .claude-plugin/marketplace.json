@@ -8,7 +8,7 @@
     {
       "name": "speakup",
       "source": "./speakup",
-      "description": "Kokoro-82M reads Claude's replies aloud when you type /voice (off by default; af_aoede voice, swappable). /v aliases /read-along"
+      "description": "Claude reads its replies aloud only when you type /voice. Recommended voice model: Kokoro-82M (af_aoede), swappable for any read-along voice. /v aliases /read-along"
     }
   ]
 }

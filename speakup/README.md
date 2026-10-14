@@ -1,23 +1,20 @@
 # Speakup for Claude Code
 
-<img width="2172" height="724" alt="exec-c74240fe-f8cb-4d80-8484-30022f430a65" src="https://github.com/user-attachments/assets/de7b126a-ce12-44ae-b881-61dcfd9c024e" />
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/banner-dark.png">
-  <img src="docs/banner-light.png" width="100%" alt="Speakup, a mod for Claude Code: type /voice and Claude reads its replies aloud in Kokoro-82M's af_aoede voice, on your own machine.">
-</picture>
+<img width="2172" height="724" alt="Speakup, a mod for Claude Code: type /voice and Claude reads its replies aloud, on your own machine." src="https://github.com/user-attachments/assets/de7b126a-ce12-44ae-b881-61dcfd9c024e" />
 
 ![Needs Claude Code 2.1.299 or later](https://img.shields.io/badge/Claude_Code-2.1.299%2B-D97757)
 ![Runs on WSL, Linux and macOS](https://img.shields.io/badge/runs_on-WSL_%C2%B7_Linux_%C2%B7_macOS-4C7A9E)
-[![Voice: Kokoro-82M](https://img.shields.io/badge/voice-Kokoro--82M-8E44AD)](https://huggingface.co/hexgrad/Kokoro-82M)
+[![Recommended voice model: Kokoro-82M](https://img.shields.io/badge/recommended_voice-Kokoro--82M-8E44AD)](https://huggingface.co/hexgrad/Kokoro-82M)
 ![Voices run locally; nothing is sent anywhere](https://img.shields.io/badge/voices-local_%26_private-2E7D32)
 [![Built on read-along](https://img.shields.io/badge/built_on-read--along-555555)](https://github.com/tomfluff/claude-read-along)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
-A mod for Claude Code: Claude reads its replies to you out loud, in
-[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M)'s natural **af_aoede**
-voice, but only when you ask. Every session starts silent. Type **`/voice`**
-and it starts talking; type it again and it stops.
+A mod for Claude Code: Claude reads its replies to you out loud, but only
+when you ask. Every session starts silent. Type **`/voice`** and it starts
+talking; type it again and it stops. The recommended voice model is
+[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M), with its natural
+**af_aoede** voice, and it's what speakup sets up by default. Prefer another
+voice? [Swap it out](#swapping-the-voice).
 
 Speakup is for anyone who wants Claude's voice some of the time, not all of
 it: on for a long explanation you'd rather listen to while you look at the
@@ -27,19 +24,19 @@ which does the speaking and highlights the sentence you're hearing.
 
 - **Silent by default.** New sessions never start reading on their own.
 - **One command.** `/voice` toggles it, and says "Voice on" so you know it worked.
-- **A voice that sounds like a person.** Kokoro-82M's af_aoede at 0.9×,
-  set up for you on the first session.
-- **Local and private.** Kokoro-82M runs on your CPU. Nothing you hear is
-  sent anywhere.
+- **Recommended: Kokoro-82M.** A voice that sounds like a person
+  (af_aoede at 0.9×), set up for you on the first session.
 - **Swappable.** Any of Kokoro's ~50 voices, your system's voices, or a
   voice of your own ([below](#swapping-the-voice)).
+- **Local and private.** The voice runs on your machine. Nothing you hear
+  is sent anywhere.
 - **`/v` for everything else.** A shorthand for read-along's controls:
   `/v pause`, `/v stop`, `/v speed 1.2`.
 
-## The voice: Kokoro-82M
+## Recommended voice model: Kokoro-82M
 
 [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M), by hexgrad, is the
-heart of speakup: an open-weight, 82-million-parameter text-to-speech model
+voice model we recommend, and the one speakup sets up by default: an open-weight, 82-million-parameter text-to-speech model
 (Apache 2.0) that sounds close to a person reading, yet is small enough to
 run on a laptop's CPU at about three times real time. No cloud service, no
 API key, no GPU.
@@ -52,6 +49,12 @@ Hindi, Italian, Portuguese, Chinese and Japanese
 ([its voices](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md)),
 and read-along switches voice by itself for a sentence in another script.
 
+It's a recommendation, not a requirement. Speakup works with any voice
+read-along can use: another Kokoro voice, your system's built-in voices, or
+Pocket TTS and a voice of your own. If Kokoro-82M isn't installed, read-along
+falls back to the best voice the machine has. See
+[Swapping the voice](#swapping-the-voice).
+
 ## What you need
 
 - **Claude Code 2.1.299 or later, in the terminal.** Speakup is a mod, a
@@ -59,10 +62,11 @@ and read-along switches voice by itself for a sentence in another script.
 - **[read-along](https://github.com/tomfluff/claude-read-along)**, which
   speakup drives. The install below covers it.
 - **WSL, Linux or macOS**, as read-along needs.
-- **Python 3.10 to 3.13** for Kokoro's packages, or
+- **Python 3.10 to 3.13** for Kokoro-82M's packages (only with Kokoro), or
   [uv](https://docs.astral.sh/uv/), which fetches a Python of its own.
 - **An audio player:** `ffplay` (comes with ffmpeg) or SoX's `play`.
-- **About 1 GB of disk** for Kokoro-82M and its runtime.
+- **About 1 GB of disk** for Kokoro-82M and its runtime (recommended; skip
+  it to use your system's voices instead).
 
 ## Install
 
@@ -81,7 +85,8 @@ Claude asks before it installs anything. Or do it yourself, at the prompt:
 ```
 
 Answer `y` to add each marketplace, then pick the user scope. `/read-along setup`
-walks you through installing Kokoro-82M. Then open a new session and type `/voice`.
+walks you through installing Kokoro-82M, the recommended voice model (you can
+decline it and use your system's voices). Then open a new session and type `/voice`.
 
 ### Agent setup
 
@@ -99,9 +104,11 @@ saying what and how big.
    claude plugin install read-along@claude-read-along
    ```
 
-3. **Install Kokoro-82M (about 1 GB) and check for an audio player.**
-   read-along's setup downloads the model, checks it against its SHA-256,
-   and installs its runtime in a folder of its own:
+3. **Install Kokoro-82M, the recommended voice model (about 1 GB), and check
+   for an audio player.** Recommend it to the person; if they'd rather not
+   download it, skip the `setup.py` line and read-along uses the machine's
+   own voices. read-along's setup downloads the model, checks it against its
+   SHA-256, and installs its runtime in a folder of its own:
 
    ```bash
    RA="$(ls -d ~/.claude/plugins/cache/claude-read-along/read-along/*/ | sort -V | tail -1 | sed 's#/$##')"
@@ -124,7 +131,8 @@ saying what and how big.
 
 5. **Hand over.** Tell the person to open a new Claude Code session (or run
    `/reload-plugins` in this one) and type `/voice`. They should hear
-   "Voice on" in the aoede voice, then each reply read aloud.
+   "Voice on" in the aoede voice (or a system voice, without Kokoro), then
+   each reply read aloud.
 
 There's nothing to configure by hand: speakup sets read-along up itself
 ([Settings](#settings)).
@@ -154,9 +162,9 @@ player above the prompt to pause, skip or change speed.
 
 ## Swapping the voice
 
-Kokoro-82M with af_aoede is the default, not a requirement. Speakup sets the
-voice once, on its first session, so whatever you choose afterwards stays,
-and `/voice` works the same with all of them.
+Kokoro-82M with af_aoede is the recommended default, not a requirement.
+Speakup sets the voice once, on its first session, so whatever you choose
+afterwards stays, and `/voice` works the same with all of them.
 
 | Voice | Example | Setup |
 |---|---|---|
@@ -208,7 +216,7 @@ setup, to fetch the model and its Python packages. See
   `claude plugin list` shows `speakup@tim-mods` enabled, then open a new session.
 - **"Voice on" was said in a different voice?** read-along's speech service
   wasn't reachable, so speakup used the system voice for that one line. The
-  replies still use Kokoro; if they don't, run `/read-along restart`.
+  replies still use your chosen voice; if they don't, run `/read-along restart`.
 - **Silent?** Run `/read-along doctor`, then look at the service's log:
   `/tmp/read-along-<your uid>.log`.
 - **Wanted dictation?** Speakup answers `/voice`; use `/voice dictation` for
@@ -225,7 +233,7 @@ flowchart LR
     mod -- "auto-read on or off" --> ra["read-along<br/>(in Claude Code)"]
     mod -. "Voice on" .-> service
     ra -- "each reply" --> service["speech service<br/>(on your machine)"]
-    service --> kokoro["Kokoro-82M<br/>af_aoede"] --> speakers(["your speakers"])
+    service --> kokoro["Kokoro-82M, af_aoede<br/>(recommended; swappable)"] --> speakers(["your speakers"])
 ```
 
 [`hooks/register.tsx`](hooks/register.tsx) is all of speakup. At session
@@ -246,7 +254,7 @@ read), and this README follows the structure of read-along's. read-along is
 MIT licensed, © Yotam Sechayk; speakup bundles none of its code, and you
 install it from [its own repository](https://github.com/tomfluff/claude-read-along).
 
-The voice is [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) by
+The recommended voice model is [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) by
 hexgrad (Apache-2.0), run by
 [kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx) (MIT), both
 installed by read-along's setup.
