@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-const voiceOn = atom({ plugin: 'voice', key: 'voiceOn' } as const, false)
+const voiceOn = atom({ plugin: 'speakup', key: 'voiceOn' } as const, false)
 
 /** Runs `/read-along <args>` once the calling command has returned (a command.run hook can't await another command: it would wait on itself), then `after`. */
 const readAlong = ($: EngineInterface, runs: string[], after?: () => Promise<unknown>) =>

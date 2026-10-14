@@ -1,4 +1,4 @@
-# voice
+# speakup
 
 Turns read-along on and off per session. Builds on [read-along](https://github.com/tomfluff/claude-read-along).
 
@@ -16,11 +16,11 @@ Sessions start silent because read-along's `autoReadReplies` option is set to `o
 ## Install
 
 ```
-/plugin install voice --marketplace tim-rayner/mods
+/plugin install speakup --marketplace tim-rayner/mods
 ```
 
-Or from a clone: `claude plugin marketplace add ~/repos/mods && claude plugin install voice@tim-mods`.
+Or from a clone: `claude plugin marketplace add ~/repos/mods && claude plugin install speakup@tim-mods`.
 
 ## Develop
 
-`claude plugin validate voice` and `claude plugin test voice`, from the repo root.
+`claude plugin validate speakup` and `claude plugin test speakup`, from the repo root.

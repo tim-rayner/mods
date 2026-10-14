@@ -6,8 +6,8 @@
   "description": "Tim Rayner's collection of Claude Code mods",
   "plugins": [
     {
-      "name": "voice",
-      "source": "./voice",
+      "name": "speakup",
+      "source": "./speakup",
       "description": "/voice toggles read-along (off by default), /v aliases /read-along"
     }
   ]
