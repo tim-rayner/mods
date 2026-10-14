@@ -1,6 +1,7 @@
 # Speakup for Claude Code
 
-<!-- Banner: drop the images in speakup/docs/. One image works for both: give both lines the same file. -->
+<img width="2172" height="724" alt="exec-c74240fe-f8cb-4d80-8484-30022f430a65" src="https://github.com/user-attachments/assets/de7b126a-ce12-44ae-b881-61dcfd9c024e" />
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/banner-dark.png">
   <img src="docs/banner-light.png" width="100%" alt="Speakup, a mod for Claude Code: type /voice and Claude reads its replies aloud in Kokoro-82M's af_aoede voice, on your own machine.">
