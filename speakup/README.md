@@ -11,6 +11,7 @@
 [![Voice: Kokoro-82M](https://img.shields.io/badge/voice-Kokoro--82M-8E44AD)](https://huggingface.co/hexgrad/Kokoro-82M)
 ![Voices run locally; nothing is sent anywhere](https://img.shields.io/badge/voices-local_%26_private-2E7D32)
 [![Built on read-along](https://img.shields.io/badge/built_on-read--along-555555)](https://github.com/tomfluff/claude-read-along)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
 A mod for Claude Code: Claude reads its replies to you out loud, in
 [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M)'s natural **af_aoede**
@@ -234,8 +235,19 @@ voice. `/v` hands its arguments to `/read-along`.
 
 ## Credits and licence
 
-Speakup is built on [read-along](https://github.com/tomfluff/claude-read-along)
-by Yotam Sechayk (MIT), and speaks with
-[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) by hexgrad
-(Apache-2.0), run by [kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx)
-(MIT). Speakup bundles none of them.
+**Speakup is built on [read-along](https://github.com/tomfluff/claude-read-along)
+by [Yotam Sechayk](https://github.com/tomfluff).** read-along does all of the
+speaking: the speech service, the Kokoro setup, the voices, the highlight and
+the player. Speakup only decides when it speaks, and wouldn't exist without it.
+Speakup also follows read-along's own conventions to talk to its speech
+service (the socket, the `/speak` request, and how the Voices setting is
+read), and this README follows the structure of read-along's. read-along is
+MIT licensed, © Yotam Sechayk; speakup bundles none of its code, and you
+install it from [its own repository](https://github.com/tomfluff/claude-read-along).
+
+The voice is [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) by
+hexgrad (Apache-2.0), run by
+[kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx) (MIT), both
+installed by read-along's setup.
+
+Speakup itself is MIT licensed; see [LICENSE](LICENSE).

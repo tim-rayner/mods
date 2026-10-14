@@ -5,5 +5,7 @@
   "types": "./types/index.d.ts",
   "author": {
     "name": "Tim Rayner"
-  }
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/tim-rayner/mods/tree/main/speakup"
 }
