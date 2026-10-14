@@ -8,7 +8,7 @@
     {
       "name": "voice",
       "source": "./voice",
-      "description": "/voice toggles read-along (off by default), /r aliases /read-along"
+      "description": "/voice toggles read-along (off by default), /v aliases /read-along"
     }
   ]
 }

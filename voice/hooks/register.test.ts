@@ -9,10 +9,10 @@ const readAlongRuns = (on: Parameters<Parameters<typeof test>[1]>[1]) => {
   return runs
 }
 
-test('/r forwards its arguments to /read-along', async ($, on) => {
+test('/v forwards its arguments to /read-along', async ($, on) => {
   const clock = mock.clock(on)
   const runs = readAlongRuns(on)
-  await $.command.run({ command: 'r', args: 'stop' })
+  await $.command.run({ command: 'v', args: 'stop' })
   await clock.advance(0)
   expect(runs).toEqual(['stop'])
 })

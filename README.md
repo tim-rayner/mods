@@ -4,7 +4,7 @@ My collection of Claude Code mods. Each folder is one mod; `.claude-plugin/marke
 
 | Mod | What it does |
 | --- | --- |
-| [voice](voice/) | `/voice` toggles [read-along](https://github.com/tomfluff/claude-read-along) reading replies aloud (off by default); `/r` aliases `/read-along`. |
+| [voice](voice/) | `/voice` toggles [read-along](https://github.com/tomfluff/claude-read-along) reading replies aloud (off by default); `/v` aliases `/read-along`. |
 
 ## Install a mod
 

@@ -55,7 +55,7 @@ async function sayAloud($: EngineInterface, text: string) {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
-      name: 'r',
+      name: 'v',
       description: 'Alias for /read-along: read | stop | pause | speed N | …',
       argumentHint: '[read|stop|pause|speed N|…]',
     })
@@ -70,8 +70,8 @@ export const register: Register = on => {
     return next(e)
   })
 
-  // /r → /read-along, arguments and all.
-  on('command.run', { command: 'r' }, async ($, e) => {
+  // /v → /read-along, arguments and all.
+  on('command.run', { command: 'v' }, async ($, e) => {
     readAlong($, [e.args])
     return { text: '' }
   })
