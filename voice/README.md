@@ -4,7 +4,7 @@ Turns read-along on and off per session. Builds on [read-along](https://github.c
 
 | Command | What it does |
 | --- | --- |
-| `/voice` | Toggle read-along reading replies aloud for this session. Off at the start of every session. |
+| `/voice` | Toggle read-along reading replies aloud for this session (off at the start of every session). Turning it on says "Voice on" aloud in your read-along voice. |
 | `/voice on` / `/voice off` | Set it explicitly (`off` also stops anything being read). |
 | `/voice all` | Read every text block as it streams, not just the final answer. |
 | `/voice dictation …` | Pass through to Claude Code's built-in `/voice` (dictation), where this build has one. |

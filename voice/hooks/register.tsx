@@ -3,11 +3,54 @@ import type { EngineInterface, Register } from 'claude-code'
 
 const voiceOn = atom({ plugin: 'voice', key: 'voiceOn' } as const, false)
 
-/** Runs `/read-along <args>` once the calling command has returned: a command.run hook can't await another command (it would wait on itself). */
-const readAlong = ($: EngineInterface, ...runs: string[]) =>
+/** Runs `/read-along <args>` once the calling command has returned (a command.run hook can't await another command: it would wait on itself), then `after`. */
+const readAlong = ($: EngineInterface, runs: string[], after?: () => Promise<unknown>) =>
   $.clock.after(0, async () => {
     for (const args of runs) await $.command.run({ command: 'read-along', args })
+    await after?.()
   })
+
+/** read-along's `voices` option, `main=aoede, auto; ja=…`, as the first voice of each group, as its own mod reads it. */
+const firstVoices = (option: string) => {
+  const out: Record<string, string> = {}
+  for (const part of option.split(';')) {
+    const m = part.match(/^\s*([a-z]{2,4})\s*=(.*)$/)
+    const first = (m?.[2] ?? part).split(',').map(v => v.trim()).find(Boolean)
+    if (first) out[m?.[1] ?? 'main'] = first
+  }
+  return out
+}
+
+/**
+ * Says `text` in read-along's voice, through its speech service (the socket its
+ * mod starts at session start); in the system voice where that service can't be reached.
+ */
+async function sayAloud($: EngineInterface, text: string) {
+  try {
+    const rows = await $.config.list()
+    const option = (field: string) => rows.find(r => r.key === `read-along.${field}`)?.value
+    const voices = option('voices')
+    const speed = Number(option('speed'))
+    const volume = Number(option('volume'))
+    const res = await $.http.fetch('http://speakd/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        key: 'voice-mod',
+        label: 'voice',
+        mode: 'now',
+        voices: typeof voices === 'string' ? firstVoices(voices) : { main: 'auto' },
+        speed: Number.isFinite(speed) && speed > 0 ? speed : 1,
+        volume: Number.isFinite(volume) ? volume / 100 : 1,
+      }),
+      socketPath: `/tmp/read-along-${(await $.env.get('USER')) ?? 'user'}.sock`,
+    })
+    if (!res.ok) throw new Error(`speech service answered ${res.status}`)
+  } catch {
+    await $.audio.speak(text).catch(() => {})
+  }
+}
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
@@ -29,11 +72,11 @@ export const register: Register = on => {
 
   // /r → /read-along, arguments and all.
   on('command.run', { command: 'r' }, async ($, e) => {
-    readAlong($, e.args)
+    readAlong($, [e.args])
     return { text: '' }
   })
 
-  // /voice toggles read-along's auto-read for this session; read-along's own line reports the change.
+  // /voice toggles read-along's auto-read for this session, and says "Voice on" aloud when it turns on.
   on('command.run', { command: 'voice' }, async ($, e, next) => {
     const [verb = '', ...rest] = e.args.trim().split(/\s+/).filter(Boolean)
     if (verb === 'dictation') return next({ ...e, args: rest.join(' ') }) // the built-in /voice, if this build has one
@@ -42,8 +85,8 @@ export const register: Register = on => {
     if (turnOn === undefined) return { text: 'Usage: /voice [on|off|all|dictation …]' }
 
     await update($, voiceOn, () => turnOn)
-    if (turnOn) readAlong($, `auto replies ${verb === 'all' ? 'all' : 'final'}`)
-    else readAlong($, 'auto replies off', 'stop')
-    return { text: '' }
+    if (turnOn) readAlong($, [`auto replies ${verb === 'all' ? 'all' : 'final'}`], () => sayAloud($, 'Voice on'))
+    else readAlong($, ['auto replies off', 'stop'])
+    return { text: turnOn ? `Voice on: replies are read aloud${verb === 'all' ? ', every block as it streams' : ''}.` : 'Voice off.' }
   })
 }
