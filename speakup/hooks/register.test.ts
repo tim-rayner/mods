@@ -35,8 +35,8 @@ test('/voice on says "Voice on" in read-along\'s voice', async ($, on) => {
   const clock = mock.clock(on)
   readAlongRuns(on)
   on('config.list', async () => ({ value: [
-    { key: 'read-along.voices', label: 'Voices', kind: 'string', value: 'main=aoede, auto; ja=kokoro:jf_alpha', provider: { kind: 'plugin', name: 'read-along' }, isLocked: false },
-    { key: 'read-along.speed', label: 'Speed', kind: 'number', value: 0.9, provider: { kind: 'plugin', name: 'read-along' }, isLocked: false },
+    { key: 'read-along.voices', label: 'Voices', kind: 'string', value: 'main=aoede, auto; ja=kokoro:jf_alpha', provider: { plugin: 'read-along', tier: 'user' }, isLocked: false },
+    { key: 'read-along.speed', label: 'Speed', kind: 'number', value: 0.9, provider: { plugin: 'read-along', tier: 'user' }, isLocked: false },
   ] }) as never)
   const sent: { url: string; body: any; socketPath?: string }[] = []
   on('http.fetch', async (_, e: any) => {
@@ -64,4 +64,44 @@ test('/voice all reads every block; bad args show usage', async ($, on) => {
   expect(runs).toEqual(['auto replies all'])
   const { text } = await $.command.run({ command: 'voice', args: 'loud' })
   expect(text).toContain('Usage')
+})
+
+const row = (field: string, value: string | number) =>
+  ({ key: `read-along.${field}`, label: field, kind: typeof value, value, provider: { plugin: 'read-along', tier: 'user' }, isLocked: false })
+
+test('session start turns auto-read off, and sets the voice and speed once', async ($, on) => {
+  const clock = mock.clock(on)
+  const config: Record<string, string | number> = { autoReadReplies: 'final', voices: 'main=auto', speed: 1.25 }
+  on('config.list', async () => ({ value: Object.entries(config).map(([f, v]) => row(f, v)) }) as never)
+  on('config.set', async (_, e: any) => ((config[e.key.split('.')[1]] = e.value), { value: e.value }) as never)
+  on('session.start', async (_, e) => ({ cwd: e.cwd }))
+  on('command.register', async (_, e) => ({ value: { command: e.name } }) as never)
+  const store: Record<string, unknown> = {}
+  on('store.get', async (_, e: any) => ({ value: store[e.key] }) as never)
+  on('store.set', async (_, e: any) => ((store[e.key] = e.value), { value: undefined }) as never)
+  await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+  await clock.advance(0)
+  for (let i = 0; i < 5 && config.speed !== 0.9; i++) await clock.advance(1)
+  expect(config).toEqual({ autoReadReplies: 'off', voices: 'main=kokoro:af_aoede, auto', speed: 0.9 })
+})
+
+test('the voice is set once: a later change of the person\'s own stays', async ($, on) => {
+  const clock = mock.clock(on)
+  const config: Record<string, string | number> = { autoReadReplies: 'off', voices: 'main=auto', speed: 1.25 }
+  on('config.list', async () => ({ value: Object.entries(config).map(([f, v]) => row(f, v)) }) as never)
+  on('config.set', async (_, e: any) => ((config[e.key.split('.')[1]] = e.value), { value: e.value }) as never)
+  on('session.start', async (_, e) => ({ cwd: e.cwd }))
+  on('command.register', async (_, e) => ({ value: { command: e.name } }) as never)
+  const store: Record<string, unknown> = {}
+  on('store.get', async (_, e: any) => ({ value: store[e.key] }) as never)
+  on('store.set', async (_, e: any) => ((store[e.key] = e.value), { value: undefined }) as never)
+  const start = async () => {
+    await $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
+    for (let i = 0; i < 5; i++) await clock.advance(1)
+  }
+  await start()
+  expect(config.voices).toBe('main=kokoro:af_aoede, auto')
+  config.voices = 'main=kokoro:af_heart'
+  await start()
+  expect(config.voices).toBe('main=kokoro:af_heart')
 })

@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, Register } from 'claude-code'
+import type { ConfigRow, EngineInterface, Register } from 'claude-code'
 
 const voiceOn = atom({ plugin: 'speakup', key: 'voiceOn' } as const, false)
 
@@ -9,6 +9,32 @@ const readAlong = ($: EngineInterface, runs: string[], after?: () => Promise<unk
     for (const args of runs) await $.command.run({ command: 'read-along', args })
     await after?.()
   })
+
+/** The voice speakup sets up: Kokoro's af_aoede, at 0.9×. */
+export const VOICE = 'main=kokoro:af_aoede, auto'
+export const SPEED = 0.9
+
+/** read-along's `/config` row for one of its options. */
+const readAlongRow = (rows: readonly ConfigRow[], field: string) =>
+  rows.find(r => r.provider.plugin === 'read-along' && r.key.endsWith(`.${field}`))
+
+/**
+ * Keeps read-along's auto-read off at the start of every session (/voice turns it on),
+ * and gives it speakup's voice and speed once, the first time both are there to set.
+ */
+async function setUpReadAlong($: EngineInterface) {
+  const rows = await $.config.list()
+  const set = async (field: string, value: string | number) => {
+    const row = readAlongRow(rows, field)
+    if (row && row.value !== value) await $.config.set({ key: row.key, value })
+  }
+  await set('autoReadReplies', 'off')
+  if (!(await $.store.get('voiceApplied')) && readAlongRow(rows, 'voices')) {
+    await set('voices', VOICE)
+    await set('speed', SPEED)
+    await $.store.set('voiceApplied', true)
+  }
+}
 
 /** read-along's `voices` option, `main=aoede, auto; ja=…`, as the first voice of each group, as its own mod reads it. */
 const firstVoices = (option: string) => {
@@ -28,7 +54,7 @@ const firstVoices = (option: string) => {
 async function sayAloud($: EngineInterface, text: string) {
   try {
     const rows = await $.config.list()
-    const option = (field: string) => rows.find(r => r.key === `read-along.${field}`)?.value
+    const option = (field: string) => readAlongRow(rows, field)?.value
     const voices = option('voices')
     const speed = Number(option('speed'))
     const volume = Number(option('volume'))
@@ -67,6 +93,7 @@ export const register: Register = on => {
         argumentHint: '[on|off|all|dictation …]',
       })
       .catch(() => {})
+    $.clock.after(0, () => setUpReadAlong($).catch(() => {})) // read-along may not be installed yet
     return next(e)
   })
 
