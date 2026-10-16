@@ -9,6 +9,16 @@
       "name": "speakup",
       "source": "./speakup",
       "description": "Claude reads its replies aloud only when you type /voice. Recommended voice model: Kokoro-82M (af_aoede), swappable for any read-along voice. /v aliases /read-along"
+    },
+    {
+      "name": "read-along",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/tomfluff/claude-read-along.git",
+        "path": "plugin",
+        "sha": "d25f454dc9e862249edb50b1df7a841641ca112f"
+      },
+      "description": "read-along by Yotam (MIT): installed with speakup, which drives it."
     }
   ]
 }

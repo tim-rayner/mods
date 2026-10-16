@@ -60,7 +60,7 @@ falls back to the best voice the machine has. See
 - **Claude Code 2.1.299 or later, in the terminal.** Speakup is a mod, a
   plugin that changes how Claude Code behaves.
 - **[read-along](https://github.com/tomfluff/claude-read-along)**, which
-  speakup drives. The install below covers it.
+  speakup drives. Installing speakup installs it too.
 - **WSL, Linux or macOS**, as read-along needs.
 - **Python 3.10 to 3.13** for Kokoro-82M's packages (only with Kokoro), or
   [uv](https://docs.astral.sh/uv/), which fetches a Python of its own.
@@ -79,14 +79,22 @@ Install the speakup mod by following https://github.com/tim-rayner/mods/blob/mai
 Claude asks before it installs anything. Or do it yourself, at the prompt:
 
 ```
-/plugin install read-along --marketplace tomfluff/claude-read-along
-/read-along setup
 /plugin install speakup --marketplace tim-rayner/mods
 ```
 
-Answer `y` to add each marketplace, then pick the user scope. `/read-along setup`
-walks you through installing Kokoro-82M, the recommended voice model (you can
-decline it and use your system's voices). Then open a new session and type `/voice`.
+Answer `y` to add the marketplace, then pick the user scope. That one line
+installs speakup and [read-along](https://github.com/tomfluff/claude-read-along),
+which does the speaking. Open a new session and type `/voice`: it works
+straight away with your system's voices.
+
+The first time you type `/voice`, speakup offers Kokoro-82M, the recommended
+voice model (about 1 GB): it puts the setup request in your prompt box, and
+pressing Enter has Claude install it, asking before it downloads anything.
+Ignore it to keep the system voices; `/voice setup` offers it again any time.
+
+Already have read-along from its own marketplace (`read-along@claude-read-along`)?
+Uninstall that copy (`/plugin uninstall read-along@claude-read-along`) so
+only one runs; your voices and settings stay.
 
 ### Agent setup
 
@@ -97,12 +105,16 @@ saying what and how big.
 1. **Check the machine.** macOS, Linux or WSL, with `python3` and `claude` on
    the PATH. Kokoro's packages need Python 3.10 to 3.13, or `uv`.
 
-2. **Install read-along**, which runs the voice:
+2. **Install speakup**, which installs read-along (the voice) with it:
 
    ```bash
-   claude plugin marketplace add tomfluff/claude-read-along
-   claude plugin install read-along@claude-read-along
+   claude plugin marketplace add tim-rayner/mods
+   claude plugin install speakup@tim-mods
    ```
+
+   If `claude plugin list` also shows `read-along@claude-read-along`, ask the
+   person, then `claude plugin uninstall read-along@claude-read-along`, so
+   only one copy runs.
 
 3. **Install Kokoro-82M, the recommended voice model (about 1 GB), and check
    for an audio player.** Recommend it to the person; if they'd rather not
@@ -111,7 +123,7 @@ saying what and how big.
    SHA-256, and installs its runtime in a folder of its own:
 
    ```bash
-   RA="$(ls -d ~/.claude/plugins/cache/claude-read-along/read-along/*/ | sort -V | tail -1 | sed 's#/$##')"
+   RA="$(ls -d ~/.claude/plugins/cache/tim-mods/read-along/*/ | sort -V | tail -1 | sed 's#/$##')"
    python3 -I "$RA/bin/setup.py" kokoro       # a few minutes: run it in the background and wait
    python3 -I "$RA/bin/speakd.py" --doctor    # "[x] Kokoro" and a Player line mean it's ready
    ```
@@ -122,14 +134,7 @@ saying what and how big.
    (`brew install uv`, or `curl -LsSf https://astral.sh/uv/install.sh | sh`)
    and run it again. read-along's `/read-along setup` skill covers anything else.
 
-4. **Install speakup:**
-
-   ```bash
-   claude plugin marketplace add tim-rayner/mods
-   claude plugin install speakup@tim-mods
-   ```
-
-5. **Hand over.** Tell the person to open a new Claude Code session (or run
+4. **Hand over.** Tell the person to open a new Claude Code session (or run
    `/reload-plugins` in this one) and type `/voice`. They should hear
    "Voice on" in the aoede voice (or a system voice, without Kokoro), then
    each reply read aloud.
@@ -148,6 +153,7 @@ stop. Next session, it's off again.
 | `/voice` | toggle reading replies aloud for this session |
 | `/voice on`, `/voice off` | set it either way (`off` also stops anything being read) |
 | `/voice all` | read every update Claude writes between tool calls too, not just the final reply |
+| `/voice setup` | put the request to install Kokoro-82M in the prompt box (Enter sends it) |
 | `/voice dictation …` | pass through to Claude Code's built-in `/voice` (dictation), where your build has one |
 | `/v …` | shorthand for `/read-along …` |
 | `/v pause`, `/v stop` | pause and resume, or stop |
@@ -240,7 +246,9 @@ flowchart LR
 start it registers `/voice` and `/v` and turns read-along's auto-read off.
 `/voice` runs `/read-along auto replies final` (or `off`, then `stop`), and
 on the way on sends "Voice on" to read-along's speech service in the same
-voice. `/v` hands its arguments to `/read-along`.
+voice. The first time it comes on without Kokoro (the service's `/info`
+says which voices are installed), it fills the prompt box with the Kokoro
+setup request, once, and only when the box is empty. `/v` hands its arguments to `/read-along`.
 
 ## Credits and licence
 
@@ -251,8 +259,10 @@ the player. Speakup only decides when it speaks, and wouldn't exist without it.
 Speakup also follows read-along's own conventions to talk to its speech
 service (the socket, the `/speak` request, and how the Voices setting is
 read), and this README follows the structure of read-along's. read-along is
-MIT licensed, © Yotam; speakup bundles none of its code, and you
-install it from [its own repository](https://github.com/tomfluff/claude-read-along).
+MIT licensed, © Yotam; speakup bundles none of its code. This marketplace
+lists read-along so it installs with speakup, fetched from
+[its own repository](https://github.com/tomfluff/claude-read-along) at a
+pinned commit.
 
 The recommended voice model is [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) by
 hexgrad (Apache-2.0), run by

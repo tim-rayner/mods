@@ -48,6 +48,9 @@ const firstVoices = (option: string) => {
   return out
 }
 
+/** read-along's speech service socket. */
+const socketPath = async ($: EngineInterface) => `/tmp/read-along-${(await $.env.get('USER')) ?? 'user'}.sock`
+
 /**
  * Says `text` in read-along's voice, through its speech service (the socket its
  * mod starts at session start); in the system voice where that service can't be reached.
@@ -71,12 +74,51 @@ async function sayAloud($: EngineInterface, text: string) {
         speed: Number.isFinite(speed) && speed > 0 ? speed : 1,
         volume: Number.isFinite(volume) ? volume / 100 : 1,
       }),
-      socketPath: `/tmp/read-along-${(await $.env.get('USER')) ?? 'user'}.sock`,
+      socketPath: await socketPath($),
     })
     if (!res.ok) throw new Error(`speech service answered ${res.status}`)
   } catch {
     await $.audio.speak(text).catch(() => {})
   }
+}
+
+/** Whether Kokoro is installed, as read-along's speech service reports it; undefined where the service can't be reached. */
+async function hasKokoro($: EngineInterface): Promise<boolean | undefined> {
+  try {
+    const res = await $.http.fetch('http://speakd/info', { socketPath: await socketPath($) })
+    if (!res.ok) return undefined
+    const info = JSON.parse(res.text) as { engines?: { name: string; ok: boolean }[] }
+    return info.engines?.some(e => e.name === 'kokoro' && e.ok) ?? undefined
+  } catch {
+    return undefined
+  }
+}
+
+/** The request `/voice setup` puts in the prompt box: Claude installs Kokoro with read-along's setup skill, which asks before downloading. */
+export const KOKORO_SETUP_PROMPT =
+  'Set up Kokoro-82M, the recommended voice for the speakup mod (about 1 GB): check this machine with /read-along doctor, then install Kokoro with the read-along plugin\'s setup skill.'
+
+/** Puts the Kokoro setup request in the prompt box: in place of the draft, or only into an empty box where `onlyIfEmpty`. */
+async function fillKokoroSetup($: EngineInterface, onlyIfEmpty = false) {
+  if (onlyIfEmpty && (await $.prompt.read()).text.trim()) return false
+  return (await $.prompt.fill({ text: KOKORO_SETUP_PROMPT })).isFilled
+}
+
+/**
+ * Offers Kokoro once, the first time the voice comes on without it: the setup
+ * request in an empty prompt box (Enter sends it), or a pointer to `/voice setup`.
+ */
+async function offerKokoro($: EngineInterface) {
+  if (await $.store.get('kokoroOffered')) return
+  if ((await hasKokoro($)) !== false) return // installed, or the service can't say
+  await $.store.set('kokoroOffered', true)
+  const filled = await fillKokoroSetup($, true).catch(() => false)
+  $.ui.toast(
+    filled
+      ? 'Using a system voice. For Kokoro-82M, the natural one (about 1 GB): press Enter to set it up.'
+      : 'Using a system voice. For Kokoro-82M, the natural one (about 1 GB): type /voice setup.',
+    { timeoutMs: 10000 },
+  )
 }
 
 export const register: Register = on => {
@@ -91,7 +133,7 @@ export const register: Register = on => {
       .register({
         name: 'voice',
         description: 'Toggle read-along reading replies aloud (off at the start of each session)',
-        argumentHint: '[on|off|all|dictation …]',
+        argumentHint: '[on|off|all|setup|dictation …]',
       })
       .catch(() => {})
     $.clock.after(0, () => setUpReadAlong($).catch(() => {})) // read-along may not be installed yet
@@ -108,12 +150,19 @@ export const register: Register = on => {
   on('command.run', { command: 'voice' }, async ($, e, next) => {
     const [verb = '', ...rest] = e.args.trim().split(/\s+/).filter(Boolean)
     if (verb === 'dictation') return next({ ...e, args: rest.join(' ') }) // the built-in /voice, if this build has one
+    if (verb === 'setup') {
+      const filled = await fillKokoroSetup($).catch(() => false)
+      return { text: filled ? 'A request to set up Kokoro-82M is in the prompt box: press Enter to send it.' : `Ask Claude: "${KOKORO_SETUP_PROMPT}"` }
+    }
 
     const turnOn = verb === 'on' || verb === 'all' ? true : verb === 'off' ? false : verb === '' ? !(await read($, voiceOn)) : undefined
-    if (turnOn === undefined) return { text: 'Usage: /voice [on|off|all|dictation …]' }
+    if (turnOn === undefined) return { text: 'Usage: /voice [on|off|all|setup|dictation …]' }
 
     await update($, voiceOn, () => turnOn)
-    if (turnOn) readAlong($, [`auto replies ${verb === 'all' ? 'all' : 'final'}`], () => sayAloud($, 'Voice on'))
+    if (turnOn) readAlong($, [`auto replies ${verb === 'all' ? 'all' : 'final'}`], async () => {
+      await sayAloud($, 'Voice on')
+      await offerKokoro($).catch(() => {})
+    })
     else readAlong($, ['auto replies off', 'stop'])
     return { text: turnOn ? `Voice on: replies are read aloud${verb === 'all' ? ', every block as it streams' : ''}.` : 'Voice off.' }
   })

@@ -1,11 +1,14 @@
 {
   "name": "speakup",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Claude reads its replies aloud only when you type /voice. Recommended voice model: Kokoro-82M (af_aoede), swappable for any read-along voice. /v aliases /read-along",
   "types": "./types/index.d.ts",
   "author": {
     "name": "Tim Rayner"
   },
   "license": "MIT",
-  "homepage": "https://github.com/tim-rayner/mods/tree/main/speakup"
+  "homepage": "https://github.com/tim-rayner/mods/tree/main/speakup",
+  "dependencies": [
+    "read-along"
+  ]
 }

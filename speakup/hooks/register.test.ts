@@ -105,3 +105,69 @@ test('the voice is set once: a later change of the person\'s own stays', async (
   await start()
   expect(config.voices).toBe('main=kokoro:af_heart')
 })
+
+/** A speech service whose /info reports Kokoro as `kokoro`; records the prompt box fills and toasts. */
+const kokoroWorld = (on: Parameters<Parameters<typeof test>[1]>[1], kokoro: boolean, draft = '') => {
+  on('http.fetch', async (_, e: any) => ({ value: { status: 200, ok: true, headers: {}, text: e.url.endsWith('/info')
+    ? JSON.stringify({ engines: [{ name: 'kokoro', ok: kokoro }, { name: 'mac', ok: true }] })
+    : '{}' } }) as never)
+  on('env.get', async () => ({ value: 'tim' }))
+  const fills: string[] = []
+  const toasts: string[] = []
+  on('prompt.read', async () => ({ value: { text: draft, cursor: draft.length } }) as never)
+  on('prompt.fill', async (_, e: any) => (fills.push(e.text), { isFilled: true }) as never)
+  on('ui.toast', async (_, e: any) => (toasts.push(e.text), { value: undefined }) as never)
+  return { fills, toasts }
+}
+
+const settle = async (clock: { advance: (ms: number) => Promise<unknown> }) => {
+  await clock.advance(0)
+  for (let i = 0; i < 5; i++) await clock.advance(1)
+}
+
+test('without Kokoro, the first /voice on offers its setup once, in the prompt box', async ($, on) => {
+  const clock = mock.clock(on)
+  mock.store(on)
+  readAlongRuns(on)
+  const { fills, toasts } = kokoroWorld(on, false)
+  await $.command.run({ command: 'voice', args: 'on' })
+  await settle(clock)
+  expect(fills.length).toBe(1)
+  expect(fills[0]).toContain('Kokoro-82M')
+  expect(toasts[0]).toContain('press Enter')
+  await $.command.run({ command: 'voice', args: 'off' })
+  await $.command.run({ command: 'voice', args: 'on' })
+  await settle(clock)
+  expect(fills.length).toBe(1)
+  expect(toasts.length).toBe(1)
+})
+
+test('with Kokoro installed, /voice on offers nothing', async ($, on) => {
+  const clock = mock.clock(on)
+  mock.store(on)
+  readAlongRuns(on)
+  const { fills, toasts } = kokoroWorld(on, true)
+  await $.command.run({ command: 'voice', args: 'on' })
+  await settle(clock)
+  expect(fills).toEqual([])
+  expect(toasts).toEqual([])
+})
+
+test('the offer leaves a draft alone and points to /voice setup', async ($, on) => {
+  const clock = mock.clock(on)
+  mock.store(on)
+  readAlongRuns(on)
+  const { fills, toasts } = kokoroWorld(on, false, 'half a thought')
+  await $.command.run({ command: 'voice', args: 'on' })
+  await settle(clock)
+  expect(fills).toEqual([])
+  expect(toasts[0]).toContain('/voice setup')
+})
+
+test('/voice setup puts the Kokoro setup request in the prompt box', async ($, on) => {
+  mock.clock(on)
+  const { fills } = kokoroWorld(on, false)
+  const { text } = await $.command.run({ command: 'voice', args: 'setup' })
+  expect(fills).toEqual([expect.stringContaining('Kokoro-82M')])
+  expect(text).toContain('press Enter')
+})
